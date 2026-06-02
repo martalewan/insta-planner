@@ -1,11 +1,37 @@
-* {
+@import "tailwindcss";
+
+@theme {
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+
+  --color-border: #e5e7eb;
+
+  --color-primary: #111827;
+  --color-primary-hover: #374151;
+
+  --radius-card: 16px;
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-  font-family:
-    Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background: #fafafa;
+  background: #ffffff;
   color: #111827;
+  font-family: Inter, system-ui, sans-serif;
 }
