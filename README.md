@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# Insta Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Instagram-style content planner built with React, TypeScript, Vite, Tailwind, and a small Node API server.
 
-Currently, two official plugins are available:
+## Run Locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Start the API server:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev:api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Start the frontend in another terminal:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev:web
 ```
+
+The frontend proxies `/api` to `http://localhost:4000`.
+
+## Instagram OAuth Setup
+
+Create `.env.local` in the project root:
+
+```env
+INSTAGRAM_CLIENT_ID=your_instagram_client_id
+INSTAGRAM_CLIENT_SECRET=your_instagram_client_secret
+INSTAGRAM_REDIRECT_URI=http://localhost:4000/api/instagram/auth/callback
+FRONTEND_URL=http://127.0.0.1:5173
+INSTAGRAM_SCOPES=instagram_business_basic
+SESSION_SECRET=replace_with_a_long_random_string
+TOKEN_ENCRYPTION_KEY=replace_with_a_long_random_string
+```
+
+In Meta Developers, add this redirect URI to the Instagram product settings:
+
+```txt
+http://localhost:4000/api/instagram/auth/callback
+```
+
+Then users connect through the `Connect Instagram` button in the app.
+
+Use the Instagram product/client credentials for `INSTAGRAM_CLIENT_ID` and `INSTAGRAM_CLIENT_SECRET`. Do not use a generic app ID from an app that has not been configured for Instagram login.
+
+## API Routes
+
+```txt
+GET /api/instagram/auth/start
+GET /api/instagram/auth/callback
+GET /api/instagram/account
+GET /api/instagram/media
+DELETE /api/instagram/connect
+```
+
+## Production Checklist
+
+- Host the API server on HTTPS.
+- Set `INSTAGRAM_REDIRECT_URI` to the production callback URL.
+- Store connected accounts in a real database instead of `.data`.
+- Keep tokens encrypted at rest.
+- Add your own user auth and link each Instagram account to a user.
+- Submit your Meta app for review/live mode so regular external users can connect.
+- Add Privacy Policy and Terms URLs in Meta app settings.
+- Add a token refresh job before long-lived tokens expire.

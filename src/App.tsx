@@ -1,25 +1,70 @@
-import { Button } from "./components/ui/Button";
+import { InstagramAccountPanel } from "./components/InstagramAccountPanel";
+import { InstagramLibrary } from "./components/InstagramLibrary";
+import { PageContainer } from "./components/ui/PageContainer";
+import { useInstagramMedia } from "./hooks/useInstagramMedia";
 
 function App() {
+  const {
+    account,
+    connectAccount,
+    connectWithToken,
+    disconnectAccount,
+    error,
+    isLive,
+    isLoading,
+    isOAuthConfigured,
+    isSavingAccount,
+    posts,
+    reloadMedia,
+    username,
+  } = useInstagramMedia();
+  const isConnected = Boolean(account);
+
   return (
-    <main className="min-h-screen bg-background p-8">
-      <section className="mx-auto max-w-5xl rounded-card border border-border bg-surface p-8 shadow-soft">
-        <p className="text-sm text-text-secondary">Instagram planner</p>
+    <main className="min-h-screen bg-background">
+      <PageContainer>
+        <div className="mx-auto max-w-5xl space-y-8">
+          <header className="flex flex-col gap-4 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-text-secondary">Instagram planner</p>
+              <h1 className="mt-2 text-2xl font-semibold tracking-normal text-text-primary">
+                {isConnected ? "Real Instagram" : "Existing Instagram"}
+              </h1>
+            </div>
 
-        <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-          Plan your content with clarity.
-        </h1>
+            <button
+              type="button"
+              className="w-fit rounded-md bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-hover"
+              onClick={() => void reloadMedia()}
+            >
+              Refresh
+            </button>
+          </header>
 
-        <p className="mt-4 max-w-xl text-text-secondary">
-          Create drafts, schedule posts, and organize your Instagram feed.
-        </p>
+          <InstagramAccountPanel
+            account={account}
+            error={error}
+            isLive={isLive}
+            isOAuthConfigured={isOAuthConfigured}
+            isSaving={isSavingAccount}
+            onConnect={connectAccount}
+            onConnectWithToken={connectWithToken}
+            onDisconnect={disconnectAccount}
+          />
 
-        <div className="mt-6">
-          <Button>Create new post</Button>
+          <InstagramLibrary
+            accountType={account?.account_type}
+            error={isOAuthConfigured ? error : null}
+            isConnected={isConnected}
+            isLoading={isLoading}
+            mediaCount={account?.media_count}
+            posts={posts}
+            profileImageUrl={account?.profilePictureUrl}
+            username={username}
+          />
         </div>
-      </section>
+      </PageContainer>
     </main>
   );
 }
-
 export default App;

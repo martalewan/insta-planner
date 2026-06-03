@@ -12,9 +12,9 @@
   --color-primary: #111827;
   --color-primary-hover: #374151;
 
-  --radius-card: 16px;
+  --radius-card: 8px;
 
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 14px 40px rgba(17, 24, 39, 0.06);
 }
 
 *,
