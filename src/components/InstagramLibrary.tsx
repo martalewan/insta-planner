@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { InstagramPost } from "../types/instagram";
+import type { PlannedPost } from "../types/plannedPost";
 import { InstagramPostCard } from "./InstagramPostCard";
+import { PlannedPostGridCard } from "./PlannedPostGridCard";
 
 type InstagramLibraryProps = {
     accountType?: string;
@@ -8,14 +10,15 @@ type InstagramLibraryProps = {
     isConnected?: boolean;
     isLoading?: boolean;
     mediaCount?: number;
+    plannedPosts: PlannedPost[];
     posts: InstagramPost[];
     profileImageUrl?: string;
     username: string;
 };
 
-type LibraryFilter = "All" | InstagramPost["format"];
+type LibraryFilter = "All" | "Existing" | "Planned";
 
-const filters: LibraryFilter[] = ["All", "Post", "Carousel", "Reel"];
+const filters: LibraryFilter[] = ["All", "Existing", "Planned"];
 
 export function InstagramLibrary({
     accountType,
@@ -23,17 +26,39 @@ export function InstagramLibrary({
     isConnected = false,
     isLoading = false,
     mediaCount,
+    plannedPosts,
     posts,
     profileImageUrl,
     username,
 }: InstagramLibraryProps) {
     const [activeFilter, setActiveFilter] = useState<LibraryFilter>("All");
-    const visiblePosts = useMemo(
+    const feedItems = useMemo(
+        () => [
+            ...plannedPosts.map((post) => ({
+                id: `planned-${post.id}`,
+                post,
+                type: "planned" as const,
+            })),
+            ...posts.map((post) => ({
+                id: `existing-${post.id}`,
+                post,
+                type: "existing" as const,
+            })),
+        ],
+        [plannedPosts, posts],
+    );
+    const visibleItems = useMemo(
         () =>
-            activeFilter === "All"
-                ? posts
-                : posts.filter((post) => post.format === activeFilter),
-        [activeFilter, posts],
+            feedItems.filter((item) => {
+                if (activeFilter === "All") {
+                    return true;
+                }
+
+                return activeFilter === "Planned"
+                    ? item.type === "planned"
+                    : item.type === "existing";
+            }),
+        [activeFilter, feedItems],
     );
 
     return (
@@ -113,15 +138,21 @@ export function InstagramLibrary({
             </div>
 
             <div className="grid grid-cols-3 gap-1 md:grid-cols-4 md:gap-2">
-                {visiblePosts.map((post) => (
-                    <InstagramPostCard key={post.id} post={post} />
+                {visibleItems.map((item) => (
+                    item.type === "planned" ? (
+                        <PlannedPostGridCard key={item.id} post={item.post} />
+                    ) : (
+                        <InstagramPostCard key={item.id} post={item.post} />
+                    )
                 ))}
             </div>
 
-            {!isLoading && visiblePosts.length === 0 && (
+            {!isLoading && visibleItems.length === 0 && (
                 <div className="flex min-h-72 items-center justify-center border border-dashed border-border text-center">
                     <p className="max-w-sm text-sm leading-6 text-text-secondary">
-                        Connect an Instagram account to display posts here.
+                        {activeFilter === "Planned"
+                            ? "Add planned posts to display them here."
+                            : "Connect an Instagram account to display posts here."}
                     </p>
                 </div>
             )}

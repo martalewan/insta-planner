@@ -1,7 +1,9 @@
 import { InstagramAccountPanel } from "./components/InstagramAccountPanel";
 import { InstagramLibrary } from "./components/InstagramLibrary";
+import { PlannerSection } from "./components/PlannerSection";
 import { PageContainer } from "./components/ui/PageContainer";
 import { useInstagramMedia } from "./hooks/useInstagramMedia";
+import { usePlannedPosts } from "./hooks/usePlannedPosts";
 
 function App() {
   const {
@@ -18,6 +20,12 @@ function App() {
     reloadMedia,
     username,
   } = useInstagramMedia();
+  const {
+    addPlannedPost,
+    deletePlannedPost,
+    plannedPosts,
+    storageError,
+  } = usePlannedPosts();
   const isConnected = Boolean(account);
 
   return (
@@ -52,12 +60,20 @@ function App() {
             onDisconnect={disconnectAccount}
           />
 
+          <PlannerSection
+            onAddPost={addPlannedPost}
+            onDeletePost={deletePlannedPost}
+            plannedPosts={plannedPosts}
+            storageError={storageError}
+          />
+
           <InstagramLibrary
             accountType={account?.account_type}
             error={isOAuthConfigured ? error : null}
             isConnected={isConnected}
             isLoading={isLoading}
             mediaCount={account?.media_count}
+            plannedPosts={plannedPosts}
             posts={posts}
             profileImageUrl={account?.profilePictureUrl}
             username={username}
